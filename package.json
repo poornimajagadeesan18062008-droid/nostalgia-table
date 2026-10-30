@@ -1,0 +1,16 @@
+{
+  "name": "nostalgia-table",
+  "version": "1.0.0",
+  "description": "Dinner that tastes like the songs they grew up with. A Qloo-powered agent that plans senior-friendly meals from a person's lifetime taste.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "keywords": ["qloo", "agent", "taste-graph", "seniors", "nutrition", "mcp", "hackathon"]
+}

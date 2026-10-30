@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nostalgia Table</title>
+<meta name="description" content="Dinner that tastes like the songs they grew up with. Senior-friendly meal planning grounded in Qloo's taste graph.">
+<style>
+  :root {
+    --bg: #fbf6ee; --card: #fffdf8; --ink: #2b211b; --muted: #6f625a; --line: #e8dccb;
+    --accent: #b4532a; --accent-ink: #fff; --good: #2f6f4e; --warn: #8a5a00; --bad: #9b2c2c;
+    --chip: #f3e6d3;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 18px/1.55 "Iowan Old Style", "Palatino Linotype", Georgia, serif; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px 64px; }
+  header { padding: 36px 0 12px; }
+  h1 { font-size: 2.3rem; margin: 0; letter-spacing: -0.01em; }
+  .tag { color: var(--muted); font-style: italic; margin: 4px 0 12px; }
+  .badge { display: inline-block; font: 600 0.8rem/1 system-ui, sans-serif; padding: 6px 10px; border-radius: 99px; }
+  .badge.live { background: #dff1e6; color: var(--good); }
+  .badge.demo { background: #fdeccb; color: var(--warn); }
+  section.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin: 16px 0; }
+  h2 { font-size: 1.3rem; margin: 0 0 10px; }
+  h3 { font-size: 1.05rem; margin: 0 0 4px; }
+  label { display: block; font: 600 0.9rem/1.3 system-ui, sans-serif; margin: 14px 0 6px; }
+  input[type=text], select { width: 100%; font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); }
+  .hint { color: var(--muted); font: 0.85rem/1.4 system-ui, sans-serif; margin-top: 4px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .chip { background: var(--chip); border-radius: 99px; padding: 4px 6px 4px 12px; font: 0.95rem system-ui, sans-serif; display: inline-flex; gap: 6px; align-items: center; }
+  .chip button { border: 0; background: transparent; cursor: pointer; font-size: 1.1rem; line-height: 1; color: var(--muted); }
+  .grid { display: grid; gap: 4px 18px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .check { display: flex; gap: 8px; align-items: flex-start; font: 0.95rem/1.3 system-ui, sans-serif; margin: 6px 0; }
+  .check input { margin-top: 3px; transform: scale(1.2); }
+  fieldset { border: 1px solid var(--line); border-radius: 10px; margin: 14px 0 0; padding: 4px 14px 10px; }
+  legend { font: 600 0.9rem system-ui, sans-serif; padding: 0 6px; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+  button.primary { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 12px; font: 700 1.05rem system-ui, sans-serif; padding: 14px 22px; cursor: pointer; }
+  button.primary:disabled { opacity: .6; cursor: wait; }
+  button.ghost { background: transparent; border: 1px solid var(--line); border-radius: 12px; font: 600 0.95rem system-ui, sans-serif; padding: 12px 16px; cursor: pointer; color: var(--ink); }
+  :focus-visible { outline: 3px solid #1e5fbf; outline-offset: 2px; }
+  .err { background: #fdeaea; color: var(--bad); border: 1px solid #f2c3c3; padding: 12px 14px; border-radius: 10px; font: 0.95rem system-ui, sans-serif; margin-top: 14px; }
+  .meal { border-top: 1px solid var(--line); padding: 14px 0; }
+  .meal:first-of-type { border-top: 0; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+  .pill { background: var(--chip); border-radius: 8px; padding: 2px 8px; font: 0.8rem system-ui, sans-serif; }
+  .pill.match { background: #dff1e6; color: var(--good); font-weight: 700; }
+  .why { color: var(--muted); font-size: 0.95rem; }
+  .tip { font-size: 0.95rem; }
+  .caution { color: var(--warn); font: 0.85rem system-ui, sans-serif; }
+  .day { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .day > div { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  .day small { font: 700 0.75rem system-ui, sans-serif; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); }
+  .bar { height: 8px; background: var(--chip); border-radius: 99px; overflow: hidden; margin: 4px 0 10px; }
+  .bar > i { display: block; height: 100%; background: var(--accent); }
+  .excl { font: 0.9rem/1.4 system-ui, sans-serif; margin: 6px 0; }
+  .excl b { font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; font: 0.8rem/1.4 ui-monospace, Menlo, monospace; }
+  td, th { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--line); vertical-align: top; word-break: break-word; }
+  details summary { cursor: pointer; font: 700 1rem system-ui, sans-serif; }
+  .disclaimer { color: var(--muted); font: 0.85rem/1.4 system-ui, sans-serif; margin-top: 18px; }
+  .steps li { margin: 4px 0; font: 0.95rem/1.4 system-ui, sans-serif; }
+  @media (max-width: 520px) { body { font-size: 17px; } h1 { font-size: 1.9rem; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Nostalgia Table</h1>
+    <p class="tag">Dinner that tastes like the songs they grew up with.</p>
+    <span id="mode" class="badge demo">Checking…</span>
+    <p class="hint" id="modeHint"></p>
+  </header>
+
+  <section class="card">
+    <h2>Who are we cooking for?</h2>
+    <form id="form" autocomplete="off">
+      <label for="name">Their first name (optional)</label>
+      <input id="name" type="text" maxlength="40">
+
+      <label for="fav">Music, films, shows or books they loved</label>
+      <input id="fav" type="text" placeholder="Type a name, then press Enter" maxlength="80">
+      <div class="hint">Up to 8. Tip: write <code>movie: Nayakan</code> or <code>artist: Lata Mangeshkar</code> to be exact.</div>
+      <div class="chips" id="chips" aria-live="polite"></div>
+
+      <label for="loc">City (to also find places nearby)</label>
+      <input id="loc" type="text" placeholder="e.g. Chennai" maxlength="80">
+
+      <fieldset>
+        <legend>Eating and swallowing</legend>
+        <label for="chew" style="margin-top:8px">Texture</label>
+        <select id="chew">
+          <option value="regular">Regular</option>
+          <option value="soft">Soft (easy to chew)</option>
+          <option value="very-soft">Very soft (mashable)</option>
+        </select>
+        <div class="grid">
+          <label class="check"><input type="checkbox" id="lowSodium"> Low sodium</label>
+          <label class="check"><input type="checkbox" id="lowSugar"> Low sugar (diabetes)</label>
+          <label class="check"><input type="checkbox" id="vegetarian"> Vegetarian</label>
+          <label class="check"><input type="checkbox" id="lowHeatDelivery"> Delivered lukewarm (low-heat delivery)</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Medicines (as advised by their doctor)</legend>
+        <div class="grid">
+          <label class="check"><input type="checkbox" id="warfarin"> Blood thinner (warfarin): limit vitamin K greens</label>
+          <label class="check"><input type="checkbox" id="grapefruit"> Medicine that interacts with grapefruit</label>
+          <label class="check"><input type="checkbox" id="potassiumRestricted"> Potassium restricted</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Allergies</legend>
+        <div class="grid" id="allergens"></div>
+        <label for="avoid">Other ingredients to avoid (comma separated)</label>
+        <input id="avoid" type="text" placeholder="e.g. mushroom, coconut" maxlength="120">
+      </fieldset>
+
+      <div class="actions">
+        <button class="primary" id="go" type="submit">Plan their meals</button>
+        <button class="ghost" id="example" type="button">Try an example</button>
+      </div>
+      <div id="error" class="err" role="alert" hidden></div>
+    </form>
+  </section>
+
+  <div id="results"></div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const ALLERGENS = ['dairy', 'nuts', 'gluten', 'egg', 'fish', 'shellfish', 'soy', 'sesame'];
+let favourites = [];
+
+// Safe DOM builder: never uses innerHTML with data.
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === 'class') el.className = v;
+    else if (k === 'style') el.style.cssText = v;
+    else el.setAttribute(k, v);
+  }
+  for (const kid of kids.flat()) {
+    if (kid == null || kid === false) continue;
+    el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  }
+  return el;
+}
+
+ALLERGENS.forEach((a) => {
+  $('allergens').append(h('label', { class: 'check' }, h('input', { type: 'checkbox', 'data-allergen': a }), a[0].toUpperCase() + a.slice(1)));
+});
+
+function renderChips() {
+  const box = $('chips');
+  box.replaceChildren(...favourites.map((f, i) =>
+    h('span', { class: 'chip' }, f, h('button', { type: 'button', 'aria-label': 'Remove ' + f }, '×'))
+  ));
+  [...box.children].forEach((chip, i) => chip.querySelector('button').addEventListener('click', () => { favourites.splice(i, 1); renderChips(); }));
+}
+function addFav(v) {
+  v = v.trim();
+  if (!v || favourites.length >= 8 || favourites.includes(v)) return;
+  favourites.push(v); renderChips();
+}
+$('fav').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); addFav($('fav').value); $('fav').value = ''; }
+});
+$('fav').addEventListener('blur', () => { addFav($('fav').value); $('fav').value = ''; });
+
+$('example').addEventListener('click', () => {
+  favourites = ['Ilaiyaraaja', 'Thillana Mohanambal', 'Kishore Kumar']; renderChips();
+  $('name').value = 'Appa'; $('loc').value = 'Chennai'; $('chew').value = 'soft';
+  $('lowSodium').checked = true; $('warfarin').checked = true; $('lowHeatDelivery').checked = true;
+});
+
+function payload() {
+  return {
+    name: $('name').value,
+    favourites,
+    location: $('loc').value,
+    constraints: {
+      chew: $('chew').value,
+      lowSodium: $('lowSodium').checked,
+      lowSugar: $('lowSugar').checked,
+      vegetarian: $('vegetarian').checked,
+      lowHeatDelivery: $('lowHeatDelivery').checked,
+      allergens: [...document.querySelectorAll('[data-allergen]:checked')].map((c) => c.dataset.allergen),
+      avoid: $('avoid').value,
+      meds: { warfarin: $('warfarin').checked, grapefruit: $('grapefruit').checked, potassiumRestricted: $('potassiumRestricted').checked },
+    },
+  };
+}
+
+function mealCard(m) {
+  return h('div', { class: 'meal' },
+    h('h3', {}, m.name),
+    h('div', { class: 'meta' },
+      h('span', { class: 'pill match' }, m.tasteMatch + '% taste match'),
+      h('span', { class: 'pill' }, m.cuisine),
+      h('span', { class: 'pill' }, m.texture + ' texture'),
+      h('span', { class: 'pill' }, m.sodium + ' sodium'),
+      m.sugar !== 'low' && h('span', { class: 'pill' }, m.sugar + ' sugar')),
+    h('div', { class: 'why' }, m.why),
+    h('div', { class: 'tip' }, 'Tip: ' + m.tip),
+    m.cautions.length > 0 && h('div', { class: 'caution' }, m.cautions.join(' · ')));
+}
+
+function render(d) {
+  const who = d.profile.name || 'them';
+  const r = $('results');
+  const dayEntries = Object.entries(d.dayPlan);
+  r.replaceChildren(
+    h('section', { class: 'card' },
+      h('h2', {}, 'What Qloo learned about ' + who),
+      h('p', {}, 'Matched in the taste graph: ', d.taste.resolved.map((x) => x.name + (x.type ? ' (' + x.type + ')' : '')).join(', ') + '.'),
+      d.taste.cuisines.map((c) => h('div', {},
+        h('div', {}, c.label + ' · ' + c.score + '%'),
+        h('div', { class: 'bar' }, h('i', { style: 'width:' + c.score + '%' })))),
+      d.notes.map((n) => h('p', { class: 'hint' }, n))),
+    dayEntries.length > 0 && h('section', { class: 'card' },
+      h('h2', {}, "A day at " + who + "'s table"),
+      h('div', { class: 'day' }, dayEntries.map(([meal, m]) => h('div', {}, h('small', {}, meal), h('h3', {}, m.name), h('div', { class: 'why' }, m.cuisine + ' · ' + m.texture))))),
+    h('section', { class: 'card' },
+      h('h2', {}, 'Meals they are likely to love, and that are safe'),
+      d.meals.length ? d.meals.map(mealCard) : h('p', {}, 'No dishes passed every constraint. Try relaxing a preference, or ask a dietitian.')),
+    d.excluded.length > 0 && h('section', { class: 'card' },
+      h('details', {},
+        h('summary', {}, 'Left out on purpose (' + d.excluded.length + ')'),
+        d.excluded.map((e) => h('div', { class: 'excl' }, h('b', {}, e.name), ' (' + e.cuisine + '): ' + e.reasons.join('; '))))),
+    d.places.length > 0 && h('section', { class: 'card' },
+      h('h2', {}, 'Places their taste points to'),
+      d.places.map((p) => h('div', { class: 'meal' }, h('h3', {}, p.name), h('div', { class: 'why' }, [p.address, p.tags.join(', ')].filter(Boolean).join(' · ')),
+        h('div', { class: 'hint' }, 'Call ahead and ask about soft textures and low-salt cooking.')))),
+    h('section', { class: 'card' },
+      h('details', {},
+        h('summary', {}, 'How the agent worked (' + d.qlooCalls.length + ' Qloo calls)'),
+        h('ol', { class: 'steps' }, d.steps.map((s) => h('li', {}, h('b', {}, s.name + ': '), s.detail))),
+        h('table', {}, h('thead', {}, h('tr', {}, ['Step', 'Request', 'Status', 'ms', ''].map((t) => h('th', {}, t)))),
+          h('tbody', {}, d.qlooCalls.map((c) => h('tr', {},
+            h('td', {}, c.step), h('td', {}, c.method + ' ' + c.path + ' ' + JSON.stringify(c.params)),
+            h('td', {}, c.status ?? c.error), h('td', {}, c.ms), h('td', {}, c.cached ? 'cached' : (c.mock ? 'demo' : ''))))))),
+      h('p', { class: 'disclaimer' }, d.disclaimer)));
+  r.scrollIntoView({ behavior: 'smooth' });
+}
+
+$('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  addFav($('fav').value); $('fav').value = '';
+  const err = $('error'); err.hidden = true;
+  $('go').disabled = true; $('go').textContent = 'Asking Qloo…';
+  try {
+    const res = await fetch('/api/plan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload()) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Request failed');
+    render(data);
+  } catch (ex) {
+    err.textContent = ex.message; err.hidden = false;
+  } finally {
+    $('go').disabled = false; $('go').textContent = 'Plan their meals';
+  }
+});
+
+fetch('/api/status').then((r) => r.json()).then((s) => {
+  const b = $('mode');
+  if (s.mode === 'live') { b.textContent = 'Live Qloo taste graph'; b.className = 'badge live'; }
+  else { b.textContent = 'Demo data (not Qloo)'; b.className = 'badge demo'; $('modeHint').textContent = 'No Qloo API key is configured on this server, so a small illustrative taste graph is used.'; }
+}).catch(() => { $('mode').textContent = 'Offline'; });
+</script>
+</body>
+</html>

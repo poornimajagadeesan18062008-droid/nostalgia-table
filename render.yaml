@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: nostalgia-table
+    runtime: node
+    plan: free
+    buildCommand: echo "no build step"
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: QLOO_API_KEY
+        sync: false
+      - key: QLOO_API_BASE
+        value: https://hackathon.api.qloo.com
